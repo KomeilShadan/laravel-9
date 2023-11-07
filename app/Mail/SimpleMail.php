@@ -27,7 +27,10 @@ class SimpleMail extends Mailable
     public function build()
     {
         return $this->subject($this->subject)
-            ->with(['body' => $this->body])
+            ->with([
+                'subject' => $this->subject,
+                'body' => $this->body
+            ])
             ->view('emails.custom');
     }
 

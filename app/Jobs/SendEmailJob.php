@@ -3,9 +3,8 @@
 namespace App\Jobs;
 
 use App\Mail\SimpleMail;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeEncrypted;
-use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -14,23 +13,19 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Throwable;
 
-class SendEmailJob implements ShouldQueue, ShouldBeUniqueUntilProcessing, ShouldBeEncrypted
+class SendEmailJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries = 3;
-    public $shouldBeEncrypted = true;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(array $emailData, $user)
-    {
-        $this->emailData = $emailData;
-        $this->user = $user;
-    }
+    public function __construct(private array $emailData, private User $user)
+    {}
 
     /**
      * Execute the job.
@@ -45,11 +40,13 @@ class SendEmailJob implements ShouldQueue, ShouldBeUniqueUntilProcessing, Should
         $body = $this->emailData['body'];
 
         $mail = new SimpleMail($subject, $body);
+        $mail->from('laravel.9@test.com', 'Admin');
+
         Mail::to($recipient)->send($mail);
         }
         catch (Throwable $e) {
             Log::info('[SendEmailJob][handle][Failed]: '.$e->getMessage());
-
+            $this->fail();
         }
     }
 

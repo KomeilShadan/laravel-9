@@ -5,13 +5,10 @@ namespace Tests\Feature;
 use App\Http\Controllers\EmailController;
 use App\Jobs\SendEmailJob;
 use App\Models\User;
-use Elasticsearch\Client;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Queue;
-use Mockery;
 use Tests\TestCase;
 
 class EmailTest extends TestCase
