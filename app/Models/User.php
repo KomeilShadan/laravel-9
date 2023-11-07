@@ -69,7 +69,7 @@ class User extends Authenticatable
      * @param  string  $salutation
      * @return string
      */
-    public function getGreeting(bool $smallTalk = true, string $salutation): string
+    public function getGreeting(string $salutation, bool $smallTalk = true,): string
     {
         $greeting = "$salutation, {$this->name}!";
 

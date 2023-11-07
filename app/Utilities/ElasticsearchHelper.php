@@ -4,7 +4,6 @@ namespace App\Utilities;
 
 use App\Utilities\Contracts\ElasticsearchHelperInterface;
 use Elasticsearch\Client;
-use Elasticsearch\ClientBuilder;
 
 class ElasticsearchHelper implements ElasticsearchHelperInterface
 {
@@ -12,7 +11,7 @@ class ElasticsearchHelper implements ElasticsearchHelperInterface
 
     public function __construct()
     {
-        $this->client = ClientBuilder::create()->build();
+        $this->client = createElasticsearchClient();
     }
 
     /**
@@ -27,7 +26,6 @@ class ElasticsearchHelper implements ElasticsearchHelperInterface
             'body' => $messageBody,
             'subject' => $messageSubject,
             'to' => $toEmailAddress,
-            'timestamp' => time(),
         ];
 
         $params = [

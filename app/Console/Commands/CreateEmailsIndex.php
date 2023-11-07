@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Elasticsearch\Client;
 use Elasticsearch\ClientBuilder;
 use Illuminate\Console\Command;
 
@@ -25,7 +26,7 @@ class CreateEmailsIndex extends Command
     {
         $indexName = 'emails';
         $fresh = $this->option('fresh');
-        $client = ClientBuilder::create()->build();
+        $client = createElasticsearchClient();
 
         if ($fresh) {
             $this->deleteIndex($client, $indexName);
@@ -50,9 +51,6 @@ class CreateEmailsIndex extends Command
                         'body' => [
                             'type' => 'text',
                         ],
-                        'timestamp' => [
-                            'type' => 'date',
-                        ],
                     ],
                 ],
             ],
@@ -63,6 +61,7 @@ class CreateEmailsIndex extends Command
         if (!$indexExists) {
             $response = $client->indices()->create($indexParams);
             $this->info('Index created successfully!');
+            return;
         }
 
         $this->info('Index already exists!');

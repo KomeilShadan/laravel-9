@@ -18,8 +18,6 @@ class SendEmailJob implements ShouldQueue, ShouldBeUniqueUntilProcessing, Should
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $connection = 'redis';
-    public $queue = 'emails';
     public $tries = 3;
     public $shouldBeEncrypted = true;
 

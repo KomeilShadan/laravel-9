@@ -7,8 +7,8 @@ use App\Jobs\SendEmailJob;
 use App\Models\User;
 use App\Utilities\Contracts\ElasticsearchHelperInterface;
 use App\Utilities\Contracts\RedisHelperInterface;
-use Elasticsearch\ClientBuilder;
 use Illuminate\Http\JsonResponse;
+use Throwable;
 
 class EmailController extends Controller
 {
@@ -36,7 +36,7 @@ class EmailController extends Controller
 
             $this->redisHelper->storeRecentMessage($docId, $messageSubject, $toEmailAddress);
 
-            dispatch(new SendEmailJob($emailData, $user));
+            SendEmailJob::dispatch($emailData, $user);
         }
         return response()->json(['message' => 'Emails sent successfully!'], 200);
     }
@@ -47,7 +47,7 @@ class EmailController extends Controller
      */
     public function list(): JsonResponse
     {
-        $client = ClientBuilder::create()->build();
+        $client = createElasticsearchClient();
 
         $params = [
             'index' => 'emails',
