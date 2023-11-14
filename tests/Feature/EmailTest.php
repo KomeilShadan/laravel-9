@@ -40,10 +40,11 @@ class EmailTest extends TestCase
         $response->assertJson(['message' => 'Emails sent successfully!']);
 
         foreach ($data as $email) {
-            Queue::assertPushed(SendEmailJob::class, function ($job) use ($email) {
-                return $job->emailData['recipient'] === $email['recipient']
-                    && $job->emailData['subject'] === $email['subject']
-                    && $job->emailData['body'] === $email['body'];
+            Queue::assertPushedOn('emails',
+                SendEmailJob::class, function ($job) use ($email) {
+                    return $job->emailData['recipient'] === $email['recipient']
+                        && $job->emailData['subject'] === $email['subject']
+                        && $job->emailData['body'] === $email['body'];
             });
         }
     }

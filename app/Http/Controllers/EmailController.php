@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Utilities\Contracts\ElasticsearchHelperInterface;
 use App\Utilities\Contracts\RedisHelperInterface;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Bus;
 use Throwable;
 
 class EmailController extends Controller
@@ -21,10 +22,12 @@ class EmailController extends Controller
      * @param User $user
      * @param EmailSendRequest $request
      * @return JsonResponse
+     * @throws Throwable
      */
     public function send(User $user, EmailSendRequest $request): JsonResponse
     {
         $emails = $request->input('emails');
+        $batch = [];
 
         foreach ($emails as $emailData) {
 
@@ -36,7 +39,14 @@ class EmailController extends Controller
 
             $this->redisHelper->storeRecentMessage($docId, $messageSubject, $toEmailAddress);
 
-            SendEmailJob::dispatch($emailData, $user);
+            $batch = [
+                ...$batch,
+                new SendEmailJob($emailData, $user)
+            ];
+            Bus::batch($batch)
+                ->onQueue('emails')
+                ->onConnection('redis')
+                ->dispatch();
         }
         return response()->json(['message' => 'Emails sent successfully!'], 200);
     }
