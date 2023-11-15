@@ -39,24 +39,26 @@ class EmailController extends Controller
 
             $this->redisHelper->storeRecentMessage($docId, $messageSubject, $toEmailAddress);
 
-            $batch = [
-                ...$batch,
-                new SendEmailJob($emailData, $user)
-            ];
-            Bus::batch($batch)
-                ->onQueue('emails')
-                ->onConnection('redis')
-                ->dispatch();
+            $batch[] = new SendEmailJob($emailData, $user);
         }
+
+        Bus::batch($batch)
+            ->onQueue('emails')
+            ->onConnection('redis')
+            ->dispatch();
+
         return response()->json(['message' => 'Emails sent successfully!'], 200);
     }
 
 
     /**
+     * @param $task
      * @return JsonResponse
      */
-    public function list(): JsonResponse
+    public function list($task): JsonResponse
     {
+        //$this->authorize('update', ['task' => $task]);
+
         $client = createElasticsearchClient();
 
         $params = [
