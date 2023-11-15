@@ -52,13 +52,10 @@ class EmailController extends Controller
 
 
     /**
-     * @param $task
      * @return JsonResponse
      */
-    public function list($task): JsonResponse
+    public function list(): JsonResponse
     {
-        //$this->authorize('update', ['task' => $task]);
-
         $client = createElasticsearchClient();
 
         $params = [
